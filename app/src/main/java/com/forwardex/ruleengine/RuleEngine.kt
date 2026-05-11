@@ -21,12 +21,16 @@ class RuleEngine @Inject constructor(
     private val actionExecutor: ActionExecutor,
     private val otpParser: OtpParser
 ) {
+    companion object {
+        private const val DEDUP_WINDOW_MS = 30_000L
+    }
+
     private val lock = Mutex()
     private val recentKeys = ArrayDeque<String>()
 
     suspend fun processEvent(event: TriggerEvent) = lock.withLock {
         if (event.metadata["forwardex_source"] == "self") return@withLock
-        val dedupKey = "${event.triggerType}:${event.senderNumber}:${event.message}:${event.timestamp / 30_000}"
+        val dedupKey = "${event.triggerType}:${event.senderNumber}:${event.message}:${event.timestamp / DEDUP_WINDOW_MS}"
         if (recentKeys.contains(dedupKey)) return@withLock
         recentKeys.addLast(dedupKey)
         if (recentKeys.size > 256) recentKeys.removeFirst()

@@ -67,7 +67,7 @@ private fun BottomBar(navController: NavHostController) {
             NavigationBarItem(
                 selected = false,
                 onClick = { navController.navigate(route) },
-                icon = {},
+                icon = { Text(route.first().uppercaseChar().toString()) },
                 label = { Text(route.replaceFirstChar { it.uppercase() }) }
             )
         }

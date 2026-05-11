@@ -41,7 +41,7 @@ class BackupManagerTest {
         assertThat(imported.conditions).hasSize(1)
         assertThat(imported.actions).hasSize(1)
         assertThat(imported.rules.first().name).isEqualTo("Bank OTP")
-        assertThat(imported.actions.first().actionType).isEqualTo("SEND_SMS")
+        assertThat(imported.actions.first().actionType).isEqualTo(ActionType.SEND_SMS.name)
     }
 
     @Test

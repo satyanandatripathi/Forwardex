@@ -97,7 +97,8 @@ class ActionExecutor @Inject constructor(
                         else -> requestBuilder.post(body)
                     }
                     config.jsonObject("headers")?.forEach { (key, value) ->
-                        requestBuilder.addHeader(key, value.toString().trim('"'))
+                        val headerValue = (value as? JsonPrimitive)?.contentOrNull ?: value.toString()
+                        requestBuilder.addHeader(key, headerValue)
                     }
                     val request = requestBuilder.build()
                     runCatching { httpClient.newCall(request).execute().close() }

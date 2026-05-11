@@ -38,14 +38,14 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            val storeFilePath = System.getenv("FORWARDEX_KEYSTORE_PATH")
-            if (!storeFilePath.isNullOrBlank()) {
+        val storeFilePath = System.getenv("FORWARDEX_KEYSTORE_PATH")
+        if (!storeFilePath.isNullOrBlank()) {
+            create("release") {
                 storeFile = file(storeFilePath)
+                storePassword = System.getenv("FORWARDEX_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("FORWARDEX_KEY_ALIAS")
+                keyPassword = System.getenv("FORWARDEX_KEY_PASSWORD")
             }
-            storePassword = System.getenv("FORWARDEX_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("FORWARDEX_KEY_ALIAS")
-            keyPassword = System.getenv("FORWARDEX_KEY_PASSWORD")
         }
     }
 
