@@ -36,13 +36,15 @@ class ActionExecutor @Inject constructor(
                 }
                 ActionType.AUTO_REPLY_SMS -> Timber.i("Auto-reply queued")
                 ActionType.HTTP_REQUEST -> {
+                    val cfg = Json.parseToJsonElement(action.configJson).jsonObject
+                    val url = cfg["url"]?.toString()?.trim('"').orEmpty()
                     val payload = "{\"sender\":\"${event.senderNumber.orEmpty()}\",\"message\":\"${event.message.orEmpty()}\"}"
                     val request = Request.Builder()
-                        .url(Json.parseToJsonElement(action.configJson).jsonObject["url"]?.toString()?.trim('"').orEmpty())
+                        .url(url)
                         .post(payload.toRequestBody("application/json".toMediaType()))
                         .build()
                     runCatching { httpClient.newCall(request).execute().close() }
-                        .onFailure { Timber.e(it, "Webhook action failed") }
+                        .onFailure { Timber.e(it, "Webhook action failed for URL: %s", url) }
                 }
                 ActionType.NOTIFICATION -> {
                     val builder = NotificationCompat.Builder(appContext, "forwardex_engine")

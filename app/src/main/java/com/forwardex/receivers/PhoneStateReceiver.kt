@@ -17,7 +17,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PhoneStateReceiver : BroadcastReceiver() {
     @Inject lateinit var ruleEngine: RuleEngine
-    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action != TelephonyManager.ACTION_PHONE_STATE_CHANGED) return
@@ -29,6 +28,7 @@ class PhoneStateReceiver : BroadcastReceiver() {
             TelephonyManager.EXTRA_STATE_OFFHOOK -> TriggerType.CALL_ANSWERED
             else -> null
         } ?: return
+        val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         val pendingResult = goAsync()
         receiverScope.launch {
             try {

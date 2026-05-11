@@ -17,12 +17,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SmsReceiver : BroadcastReceiver() {
     @Inject lateinit var ruleEngine: RuleEngine
-    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
         val sms = Telephony.Sms.Intents.getMessagesFromIntent(intent).joinToString(separator = "") { it.messageBody }
         val sender = Telephony.Sms.Intents.getMessagesFromIntent(intent).firstOrNull()?.originatingAddress
+        val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         val pendingResult = goAsync()
         receiverScope.launch {
             try {

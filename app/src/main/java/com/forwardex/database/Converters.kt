@@ -25,5 +25,6 @@ class Converters {
     @TypeConverter fun fromStatus(value: RuleStatus): String = value.name
     @TypeConverter fun toStatus(value: String): RuleStatus = RuleStatus.valueOf(value)
     @TypeConverter fun fromStringList(value: List<String>): String = Json.encodeToString(ListSerializer(String.serializer()), value)
-    @TypeConverter fun toStringList(value: String): List<String> = if (value.isBlank()) emptyList() else Json.decodeFromString(ListSerializer(String.serializer()), value)
+    @TypeConverter fun toStringList(value: String): List<String> =
+        if (value.isEmpty()) emptyList() else Json.decodeFromString(ListSerializer(String.serializer()), value)
 }
