@@ -42,6 +42,7 @@ class ActionExecutor @Inject constructor(
                         .post(payload.toRequestBody("application/json".toMediaType()))
                         .build()
                     runCatching { httpClient.newCall(request).execute().close() }
+                        .onFailure { Timber.e(it, "Webhook action failed") }
                 }
                 ActionType.NOTIFICATION -> {
                     val builder = NotificationCompat.Builder(appContext, "forwardex_engine")
@@ -52,7 +53,9 @@ class ActionExecutor @Inject constructor(
                 }
                 ActionType.CLIPBOARD -> {
                     val clipboard = appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    clipboard.setPrimaryClip(ClipData.newPlainText("otp", event.metadata["otp"] ?: event.message.orEmpty()))
+                    val otpCode = event.metadata["otpCode"].orEmpty()
+                    val value = otpCode.ifBlank { event.message.orEmpty() }
+                    clipboard.setPrimaryClip(ClipData.newPlainText("otp", value))
                 }
                 ActionType.LOCAL_STORAGE -> Timber.i("Persisted trigger payload locally")
                 ActionType.SEND_EMAIL -> Timber.i("Email queued for SMTP worker")

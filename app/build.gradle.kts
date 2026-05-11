@@ -31,7 +31,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.findByName("release")
+            if (!System.getenv("FORWARDEX_KEYSTORE_PATH").isNullOrBlank()) {
+                signingConfig = signingConfigs.findByName("release")
+            }
         }
     }
 

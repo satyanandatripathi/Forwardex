@@ -64,7 +64,6 @@
 
         <service
             android:name=".services.RuleEngineForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:exported="false" />
     </application>
 </manifest>

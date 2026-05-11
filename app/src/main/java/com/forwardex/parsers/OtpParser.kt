@@ -16,7 +16,7 @@ class OtpParser @Inject constructor() {
         val hasOtpSignal = listOf("otp", "verification", "auth", "code", "password").any { lower.contains(it) }
         if (!hasOtpSignal && !Regex("\\b\\d{4,8}\\b").containsMatchIn(message)) return null
 
-        val code = otpRegexes.firstNotNullOfOrNull { it.find(message)?.groupValues?.lastOrNull() } ?: return null
+        val code = otpRegexes.firstNotNullOfOrNull { it.find(message)?.groupValues?.getOrNull(1) } ?: return null
         val category = when {
             lower.contains("bank") || lower.contains("account") -> "banking"
             lower.contains("gov") || lower.contains("uid") -> "government"

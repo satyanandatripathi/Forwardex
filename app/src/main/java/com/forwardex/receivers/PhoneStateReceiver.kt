@@ -10,12 +10,14 @@ import com.forwardex.ruleengine.RuleEngine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PhoneStateReceiver : BroadcastReceiver() {
     @Inject lateinit var ruleEngine: RuleEngine
+    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action != TelephonyManager.ACTION_PHONE_STATE_CHANGED) return
@@ -27,8 +29,13 @@ class PhoneStateReceiver : BroadcastReceiver() {
             TelephonyManager.EXTRA_STATE_OFFHOOK -> TriggerType.CALL_ANSWERED
             else -> null
         } ?: return
-        CoroutineScope(Dispatchers.IO).launch {
-            ruleEngine.processEvent(TriggerEvent(triggerType = trigger, senderNumber = number, senderName = number, message = "call_event"))
+        val pendingResult = goAsync()
+        receiverScope.launch {
+            try {
+                ruleEngine.processEvent(TriggerEvent(triggerType = trigger, senderNumber = number, senderName = number, message = "call_event"))
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ import com.forwardex.domain.ConditionOperator
 import com.forwardex.domain.LogicalOperator
 import com.forwardex.domain.TriggerEvent
 import com.forwardex.parsers.UrlParser
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,7 +37,7 @@ class ConditionEvaluator @Inject constructor(
             ConditionField.SENDER_NAME -> event.senderName.orEmpty()
             ConditionField.MESSAGE_CONTENT -> event.message.orEmpty()
             ConditionField.RECEIVE_TIME -> event.timestamp.toString()
-            ConditionField.DAY_OF_WEEK -> java.time.Instant.ofEpochMilli(event.timestamp).atZone(java.time.ZoneId.systemDefault()).dayOfWeek.name
+            ConditionField.DAY_OF_WEEK -> Instant.ofEpochMilli(event.timestamp).atZone(ZoneId.systemDefault()).dayOfWeek.name
             ConditionField.SIM_SLOT -> event.simSlot?.toString().orEmpty()
             ConditionField.CONTACT_GROUP -> event.metadata["contactGroup"].orEmpty()
             ConditionField.REGEX -> event.message.orEmpty()

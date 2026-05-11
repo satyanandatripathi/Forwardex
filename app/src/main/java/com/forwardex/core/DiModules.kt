@@ -33,7 +33,7 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): ForwardexDatabase =
-        Room.databaseBuilder(context, ForwardexDatabase::class.java, "forwardex.db").fallbackToDestructiveMigration().build()
+        Room.databaseBuilder(context, ForwardexDatabase::class.java, "forwardex.db").build()
 
     @Provides fun provideRulesDao(db: ForwardexDatabase): RulesDao = db.rulesDao()
     @Provides fun provideConditionsDao(db: ForwardexDatabase): ConditionsDao = db.conditionsDao()
