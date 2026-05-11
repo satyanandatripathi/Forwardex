@@ -11,7 +11,9 @@ Forwardex is an offline-first Android automation engine for SMS/call triggers, O
 - OTP parser and URL parser heuristics
 - Compose screens: dashboard, rules, rule builder scaffold, history, settings
 - Security baseline with encrypted preferences
-- Backup/export scaffold
+- Backup/export + import scaffold with encrypted backup payload support
+- Permission onboarding and OEM battery-optimization guide screens
+- Rule execution upgrades: cooldown enforcement, retry/backoff, and stronger anti-loop guard
 - GitHub Actions CI workflow
 
 ## Build

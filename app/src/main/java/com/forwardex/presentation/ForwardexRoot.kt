@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -29,6 +30,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.forwardex.database.HistoryEntity
 import com.forwardex.database.RuleEntity
+import com.forwardex.notifications.OemOptimizationGuides
+import com.forwardex.notifications.PermissionRationale
 
 @Composable
 fun ForwardexRoot() {
@@ -45,8 +48,12 @@ fun ForwardexRoot() {
                 composable("dashboard") { DashboardScreen() }
                 composable("rules") { RulesScreen() }
                 composable("builder") { RuleBuilderScreen() }
+                composable("condition-builder") { ConditionBuilderScreen() }
+                composable("action-builder") { ActionBuilderScreen() }
                 composable("history") { HistoryScreen() }
                 composable("settings") { SettingsScreen() }
+                composable("onboarding") { PermissionOnboardingScreen() }
+                composable("oem-guides") { OemGuidesScreen() }
             }
         }
     }
@@ -54,7 +61,7 @@ fun ForwardexRoot() {
 
 @Composable
 private fun BottomBar(navController: NavHostController) {
-    val items = listOf("dashboard", "rules", "builder", "history", "settings")
+    val items = listOf("dashboard", "rules", "builder", "history", "settings", "onboarding")
     NavigationBar {
         items.forEach { route ->
             NavigationBarItem(
@@ -107,11 +114,35 @@ private fun RuleCard(rule: RuleEntity, onToggle: (RuleEntity, Boolean) -> Unit) 
 fun RuleBuilderScreen() {
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("Visual Rule Builder")
-        Text("- Trigger block")
-        Text("- Nested AND/OR conditions")
-        Text("- Ordered action chain")
-        Text("- Live preview")
-        Text("Drag/drop block interactions are scaffolded for iterative implementation.")
+        Text("- Trigger block with event type")
+        Text("- Nested condition groups (AND/OR)")
+        Text("- Ordered action chain with priorities")
+        Text("- Cooldown / retry / schedule controls")
+        HorizontalDivider()
+        Text("Navigate to dedicated builders:")
+        Text("• Condition Builder tab route: condition-builder")
+        Text("• Action Builder tab route: action-builder")
+    }
+}
+
+@Composable
+fun ConditionBuilderScreen() {
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Condition Builder")
+        Text("Supported fields: sender, message, time, SIM, regex, OTP, URL, language, length")
+        Text("Operators: contains/equals/regex/range/not-contains")
+        Text("Logic: nested AND/OR groups")
+        Text("Regex testing and multi-value input are enabled in this flow design.")
+    }
+}
+
+@Composable
+fun ActionBuilderScreen() {
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Action Builder")
+        Text("Available actions: SMS, auto-reply, HTTP, notification, clipboard, local storage, email queue")
+        Text("Template variables: sender, number, message, otp, timestamp, sim_slot")
+        Text("Action order controls execution chain sequencing.")
     }
 }
 
@@ -138,10 +169,52 @@ private fun HistoryCard(item: HistoryEntity) {
 @Composable
 fun SettingsScreen(viewModel: ForwardexViewModel = hiltViewModel()) {
     val localOnly by viewModel.localOnly.collectAsState()
-    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Permissions, backup, startup, notifications, OEM optimization")
-        Text("Local-only mode")
-        Switch(checked = localOnly, onCheckedChange = viewModel::setLocalOnly)
-        Text("No telemetry, no remote analytics, user-controlled forwarding.")
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item { Text("Permissions, backup, startup, notifications, OEM optimization") }
+        item { Text("Local-only mode") }
+        item { Switch(checked = localOnly, onCheckedChange = viewModel::setLocalOnly) }
+        item { Text("No telemetry, no remote analytics, user-controlled forwarding.") }
+        item { HorizontalDivider() }
+        item { Text("Permission onboarding route: onboarding") }
+        item { Text("OEM guides route: oem-guides") }
+    }
+}
+
+@Composable
+fun PermissionOnboardingScreen() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item { Text("Permission Onboarding") }
+        items(PermissionRationale.mapping.entries.toList()) { entry ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(entry.key)
+                    Text(entry.value)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OemGuidesScreen() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item { Text("OEM Optimization Guides") }
+        items(OemOptimizationGuides.guides.entries.toList()) { (oem, guide) ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(oem.replaceFirstChar { it.uppercase() })
+                    Text(guide)
+                }
+            }
+        }
     }
 }
